@@ -1,0 +1,52 @@
+<?php
+
+/**
+ * @file
+ * Drush Status Check module.
+ */
+
+/**
+ * Implements hook_menu().
+ */
+function drupal_status_check_menu() {
+  $items['drupal-status-check/core'] = array(
+    'title' => 'Check Modules',
+    'description' => 'Lookup current release and check github.',
+    'page callback' => 'drupal_status_check_core',
+    'access arguments' => TRUE,
+  );
+
+  return $items;
+}
+
+function drupal_status_check_core() {
+  // list from https://github.com/backdrop/backdrop-issues/issues/2789
+  $output = '';
+  $modules_ported_to_core = array('views','link','token','pathauto','date','link','email','transliteration','redirect','project_browser','entity_view_mode','file_entity');
+  foreach ($modules_ported_to_core as $module) {
+    $drupal_org_api_url = 'https://updates.drupal.org/release-history/' . $module . '/7.x';
+    $response_from_drupal = backdrop_http_request($drupal_org_api_url);
+    $xml = simplexml_load_string($response_from_drupal->data);
+
+    //$recommended_major = (string) $xml->recommended_major;
+    //$recommended_minor = (string) $xml->recommended_minor;
+    // @TODO will the current supported D7 release always be first?
+    $release_name = (string) $xml->releases->release->name;
+    $release_date = (string) $xml->releases->release->date;
+
+    // CHECK FOR MATCHING TITLE BACKDROP CORE ISSUE QUEUE ON GITHUB
+    $github_api_url = 'https://api.github.com/search/issues?q=Evaluate%20' . urlencode($release_name) . '+repo:backdrop/backdrop-issues+state:open&sort=created&order=asc';
+    //$response_from_github = backdrop_http_request($github_api_url);
+
+    //$json = drupal_json_decode($response_from_github->data);
+    //dsm($json);
+    //if ($json->total_count) {
+      //display the first match?
+      //dsm($json->items[0]['html_url']);
+    //}
+    $output .= 'Current Drupal Release: ' . $release_name . ' [<a href="https://github.com/backdrop/backdrop-issues/issues/new?title=Evaluate ' . $release_name . '&body=">Create Git Hub Issue</a>]</br>';
+    //dsm($release_date);
+
+  }
+  return $output;
+}

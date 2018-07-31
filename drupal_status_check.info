@@ -1,0 +1,5 @@
+type = module
+name = Drupal Status Check
+description = Compares release info from Drupal.org API to Github issue queue
+version = VERSION
+backdrop = 1.x
