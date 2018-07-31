@@ -13,7 +13,7 @@ function drupal_status_check_menu() {
     'title' => 'Check Modules',
     'description' => 'Lookup current release and check github.',
     'page callback' => 'drupal_status_check_core',
-    'access arguments' => TRUE,
+    'access arguments' => array('access content'),
   );
 
   return $items;
